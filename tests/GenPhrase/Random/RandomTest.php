@@ -1,34 +1,40 @@
 <?php
 
-class GenPhrase_Random_RandomTest extends PHPUnit_Framework_TestCase
+namespace GenPhrase\Tests;
+
+use GenPhrase\Random\Random;
+use GenPhrase\Random\MockRandomBytes;
+use PHPUnit\Framework\TestCase;
+
+class GenPhraseRandomRandomTest extends TestCase
 {
     /**
     * @expectedException \InvalidArgumentException
     */
     public function testTooLowPoolSizeThrowsException()
     {
-        $obj = new GenPhrase\Random\Random();
-        
+        $obj = new Random();
+
         $obj->getElement(1);
     }
-    
+
     /**
     * @expectedException \InvalidArgumentException
     */
     public function testTooHighPoolSizeThrowsException()
     {
-        $obj = new GenPhrase\Random\Random();
-        
-        $obj->getElement(65537);
+        $obj = new Random();
+
+        $obj->getElement(1048577);
     }
-    
+
     public function testGetElementGivesUniformDistribution()
     {
         $poolSize = 7776;
         $elements = array();
-        
-        $randomByteGenerator = new GenPhrase\Random\MockRandomBytes;
-        $obj = new GenPhrase\Random\Random($randomByteGenerator);
+
+        $randomByteGenerator = new MockRandomBytes;
+        $obj = new Random($randomByteGenerator);
         $obj->setMaxPoolSize($poolSize);
         $obj->setPowerOfTwo(8192);
 
@@ -45,20 +51,17 @@ class GenPhrase_Random_RandomTest extends PHPUnit_Framework_TestCase
             }
         }
 
-        $uniqElements = count(array_unique($elements));
-        $elementsCount = count($elements);
-
-        $this->assertEquals(1, $uniqElements);
-        $this->assertEquals($poolSize, $elementsCount);
+        $this->assertCount(1, array_unique($elements));
+        $this->assertEquals($poolSize, count($elements));
     }
-    
+
     /**
     * @expectedException \InvalidArgumentException
     */
     public function testInvalidPowerOfTwoThrowsException()
     {
-        $obj = new GenPhrase\Random\Random();
-        
+        $obj = new Random();
+
         $obj->setPowerOfTwo(8);
     }
 
@@ -67,9 +70,9 @@ class GenPhrase_Random_RandomTest extends PHPUnit_Framework_TestCase
      */
     public function testSetTooHighPowerOfTwoThrowsException()
     {
-        $obj = new GenPhrase\Random\Random();
+        $obj = new Random();
 
-        $obj->setPowerOfTwo(16777217);
+        $obj->setPowerOfTwo(67108865);
     }
 
     /**
@@ -77,8 +80,8 @@ class GenPhrase_Random_RandomTest extends PHPUnit_Framework_TestCase
      */
     public function testSetTooHighMaxPoolSizeThrowsException()
     {
-        $obj = new GenPhrase\Random\Random();
+        $obj = new Random();
 
-        $obj->setMaxPoolSize(65537);
+        $obj->setMaxPoolSize(1048577);
     }
 }
